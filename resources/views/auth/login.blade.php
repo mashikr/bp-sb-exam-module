@@ -20,7 +20,7 @@
 
                         <h3 class="mb-5 text-center">লগইন</h3>
 
-                        <form action="/login" method="post">
+                        <form action="{{url('/login')}}" method="post">
                             @csrf
                             <div class="form-outline mb-4">
                                 <label for="bpid" class="form-label">বিপি আইডি:</label>

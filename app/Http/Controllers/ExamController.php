@@ -53,9 +53,7 @@ class ExamController extends Controller
         $scheduledExam = \auth()->user();
         $totalQuestions = $scheduledExam->examConfiguration->total_questions;
 
-        $assignedQuestions = McqQuestion::where('type', 'exam')
-            ->where('exam_type', 'final')
-            ->inRandomOrder()
+        $assignedQuestions = McqQuestion::inRandomOrder()
             ->limit($totalQuestions)
             ->get();
 

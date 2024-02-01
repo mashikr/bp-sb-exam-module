@@ -22,7 +22,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/', [ExamController::class,'showExamPage']);
 //    Route::get('/exam/{exam_id}',[ExamController::class,'showExamPage']);
-    Route::get('/exam/assign-questions/{exam}',[ExamController::class,'assignQuestionsToMembers']);
+//    Route::get('/exam/assign-questions/{exam}',[ExamController::class,'assignQuestionsToMembers']);
     Route::get('/exam/test-page/',[ExamController::class,'showTestPage']);
     Route::post('/exam/submit-test',[ExamController::class,'submitTest']);
     Route::get('/logout',[AuthController::class,'logout']);
