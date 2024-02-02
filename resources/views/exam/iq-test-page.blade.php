@@ -210,9 +210,10 @@
 
             // Function to display the remaining time
             function displayRemainingTime(remainingTime) {
-                let hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                let minutes = Math.floor(remainingTime / 60);
+                let hours = Math.floor(remainingTime / 3600);
+                let minutes = Math.floor((remainingTime % 3600) / 60);
                 let seconds = remainingTime % 60;
+
                 $('#globalTimer').text('Exam will end in: ' + hours + 'h '+ minutes + 'm ' + seconds + 's');
             }
 

@@ -128,16 +128,14 @@ let examStatus="{{$scheduledExam->status}}";
 
 
                     $.ajax({
-                        url: '/logout',
-                        data:{examEnded:true},
+                        url: '{{ url('/logout') }}',
+                        data: { examEnded: true },
                         method: 'GET',
                         success: function() {
-
-                                window.location.href = "/login-page?examEnded=true";
-
+                            window.location.href = '{{ url('/login-page?examEnded=true') }}';
                         },
-
                     });
+
                     return;
                 }
 
