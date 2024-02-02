@@ -89,7 +89,7 @@ class ExamController extends Controller
         $result['status'] = $correctAnswersCount >= $passMark ? "passed" : "failed";
         $result['exam_id'] = $examConfiguration->exam_id;
         $result['exam_config_id'] = $examConfiguration->id;
-        $result['exam_schedule_id']=$scheduledExam->id;
+
         Result::insert($result);
        $scheduledExam->update(['status'=>'completed']);
         return view('exam.result-page', compact('result'));
