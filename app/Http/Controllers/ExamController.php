@@ -83,15 +83,16 @@ class ExamController extends Controller
             }
         }
 
-        $result['bpid'] = $scheduledExam->bpid;
-        $result['total_marks'] = $totalQuestions;
-        $result['obtained_marks'] = $correctAnswersCount;
-        $result['status'] = $correctAnswersCount >= $passMark ? "passed" : "failed";
-        $result['exam_id'] = $examConfiguration->exam_id;
-        $result['exam_config_id'] = $examConfiguration->id;
-
-        Result::insert($result);
+        $result = Result::create([
+            'bpid' => $scheduledExam->bpid,
+            'total_marks' => $totalQuestions,
+            'obtained_marks' => $correctAnswersCount,
+            'status' => $correctAnswersCount >= $passMark ? 'passed' : 'failed',
+            'exam_id' => $examConfiguration->exam_id,
+            'exam_config_id' => $examConfiguration->id,
+        ]);
        $scheduledExam->update(['status'=>'completed']);
+        $scheduledExam->update(['submission_time' => now()]);
         return view('exam.result-page', compact('result'));
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ExamSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 
 class AuthController extends Controller
@@ -26,6 +27,8 @@ class AuthController extends Controller
 
             if ($user->password == $credentials['password']) {
                 Auth::guard('web')->login($user);
+
+                $user->update(['login_time' => now()]);
 
                 return redirect()->intended('/');
             }

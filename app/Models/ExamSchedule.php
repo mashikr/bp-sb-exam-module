@@ -14,6 +14,9 @@ protected $table="exam_schedule";
 protected $fillable=[
 
     'status',
+    'login_time',
+    'submission_time',
+
 
 ];
     public function member()
