@@ -2,7 +2,7 @@
 <!-- Navbar Start -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top px-0 py-2">
     <a href="#" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-        <img style="height: 100px;width: 100px" src="{{asset("assets/image/police-logo.png")}}" alt="Logo" id="logo_main">
+        <img style="height: 100px;width: 100px" src="{{asset("assets/image/police-logo.jpg")}}" alt="Logo" id="logo_main">
     </a>
     <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>

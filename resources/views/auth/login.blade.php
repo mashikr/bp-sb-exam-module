@@ -18,18 +18,18 @@
                                 </div>
                             @endif
 
-                        <h3 class="mb-5 text-center">লগইন</h3>
+                        <h3 class="mb-5 text-center">PLEASE LOGIN</h3>
 
                         <form action="{{url('/login')}}" method="post">
                             @csrf
                             <div class="form-outline mb-4">
-                                <label for="bpid" class="form-label">বিপি আইডি:</label>
-                                <input type="text" class="form-control" name="bpid" id="bpid"  placeholder="আপনার বিপি আইডি দিন" required>
+                                <label for="bpid" class="form-label">BP ID:</label>
+                                <input type="text" class="form-control" name="bpid" id="bpid"  placeholder="Enter your BPID" required>
                             </div>
 
                             <div class="form-outline mb-4 ">
-                                <label for="mobile" class="form-label">পাসওয়ার্ড:</label>
-                                <input type="password" class="form-control" name="password" id="password"  placeholder="পাসওয়ার্ড দিন" required>
+                                <label for="mobile" class="form-label">Exam Pin:</label>
+                                <input type="password" class="form-control" name="password" id="password"  placeholder="Enter your exam Pin" required>
                             </div>
 
                             <div class="d-grid">

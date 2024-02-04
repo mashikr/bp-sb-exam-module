@@ -34,8 +34,8 @@
         <div class="container-xxl py-3 mb-5">
 
             <div class="container">
-                <h2>You Have 10 seconds for each Question</h2>
-                <!-- Add this element where you want to display the global timer -->
+
+
                 <div id="globalTimer" class="text-center" style="font-size: 18px; color: #e74c3c; margin-top: 20px;"></div>
 
                 <hr>
@@ -49,9 +49,9 @@
                             <div class=" bg-white">
 
                                 <div class="d-flex flex-row align-items-center question-title bg-light p-3">
-                                    <!-- Timer for the question -->
 
-                                    <h5><span class="text-primary me-2">প্রশ্ন <span id="question-no">{{$loop->index+1}}</span>.</span> <span class="ml-2" id="question-title">{{ $question->question }}</span></h5>
+
+                                    <h5><span class="text-primary me-2">Question <span id="question-no">{{$loop->index+1}}</span>.</span> <span class="ml-2" id="question-title">{{ $question->question }}</span></h5>
 
 
                                 </div>
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                             <div class="timer-container text-center">
-                                <div class="timer" data-seconds="10"></div>
+                                <div class="timer" data-seconds={{$question->time_in_seconds}}></div>
                             </div>
 
                             <div class="d-flex justify-content-end mt-5">
