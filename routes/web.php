@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\IqTestController;
+use App\Http\Controllers\TypingTestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/login-page',[AuthController::class,'showLoginPage']);
 Route::post('/login',[AuthController::class,'login']);
+Route::get('/typing-test', [TypingTestController::class, 'index']);
+Route::post('/typing-test/check', [TypingTestController::class, 'check']);
 
 Route::middleware(['auth'])->group(function () {
 
@@ -24,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
 //    Route::get('/exam/{exam_id}',[ExamController::class,'showExamPage']);
 //    Route::get('/exam/assign-questions/{exam}',[ExamController::class,'assignQuestionsToMembers']);
     Route::get('/exam/test-page/',[ExamController::class,'showTestPage']);
-    Route::post('/exam/submit-test',[ExamController::class,'submitTest']);
+    Route::post('/exam/submit-test',[IqTestController::class,'submitTest']);
     Route::get('/logout',[AuthController::class,'logout']);
+
 });

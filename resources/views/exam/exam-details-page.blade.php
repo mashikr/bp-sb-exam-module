@@ -63,10 +63,10 @@
                     <div class="row">
                         <div class="col-md-12 text-center mb-2 mb-md-0 d-flex flex-column justify-content-center align-items-center">
                             <h1 id="headline">{{ $scheduledExam->examConfiguration->exam->exam_name }}</h1>
-                            <div class="exam-details">
+{{--                            <div class="exam-details">--}}
 
-                                <p class="lead">Total Questions: {{ $scheduledExam->examConfiguration->total_questions }}</p>
-                            </div>
+{{--                                <p class="lead">Total Questions: {{ $scheduledExam->examConfiguration->total_questions }}</p>--}}
+{{--                            </div>--}}
                             <div id="countdown">
                                 <h2 id="countdownLabel">Exam will start in: </h2>
                                 <ul>

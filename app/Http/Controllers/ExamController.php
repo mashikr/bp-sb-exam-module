@@ -16,16 +16,15 @@ use Illuminate\Support\Facades\Hash;
 
 class ExamController extends Controller
 {
-//    public function showAllExams()
-//    {
-//
-//            $user = \auth()->user();
-//       $bpid=$user->bpid;
-//
-//        $examSchedules = ExamSchedule::where('bpid', $bpid)->get();
-//
-//        return view('exam.index', compact('examSchedules'));
-//    }
+
+    private IqTestController $iqTestController;
+    private TypingTestController $typingTestController;
+
+    public function __construct(IqTestController $iqTestController, TypingTestController $typingTestController)
+    {
+        $this->iqTestController = $iqTestController;
+        $this->typingTestController = $typingTestController;
+    }
 
     public function showExamPage()
     {
@@ -43,57 +42,25 @@ class ExamController extends Controller
         }
 
 
-
         return view('exam.exam-details-page', ['scheduledExam' => $scheduledExam]);
     }
 
+    public function showTest()
+    {
+
+    }
 
     public function showTestPage()
     {
         $scheduledExam = \auth()->user();
-        $totalQuestions = $scheduledExam->examConfiguration->total_questions;
-
-        $assignedQuestions = McqQuestion::inRandomOrder()
-            ->limit($totalQuestions)
-            ->get();
-
-        // Pass the $assignedQuestions and $member to your view
-        return view('exam.iq-test-page', compact('assignedQuestions', 'scheduledExam'));
-    }
-
-
-    public function submitTest(Request $request)
-    {
-        $scheduledExam = \auth()->user();
-        $examConfiguration = $scheduledExam->examConfiguration;
-        $totalQuestions = $examConfiguration->total_questions;
-        $passMark = $examConfiguration->pass_mark;
-        $submittedAnswers = $request->input('answer', []);
-
-        $correctAnswersCount = 0;
-
-        // Iterate over each submitted answer
-        foreach ($submittedAnswers as $questionId => $selectedAnswer) {
-
-            $correctAnswer = McqQuestion::where('question_id', $questionId)->first()->correct_option;
-
-
-            if ($selectedAnswer == $correctAnswer) {
-                $correctAnswersCount++;
-            }
+        $examType = $scheduledExam->examConfiguration->exam->type;
+        if ($examType === 'mcq') {
+            return $this->iqTestController->showTestPage($scheduledExam);
+        } elseif ($examType === 'typing_test') {
+            return $this->typingTestController->index();
         }
 
-        $result = Result::create([
-            'bpid' => $scheduledExam->bpid,
-            'total_marks' => $totalQuestions,
-            'obtained_marks' => $correctAnswersCount,
-            'status' => $correctAnswersCount >= $passMark ? 'passed' : 'failed',
-            'exam_id' => $examConfiguration->exam_id,
-            'exam_config_id' => $examConfiguration->id,
-        ]);
-       $scheduledExam->update(['status'=>'completed']);
-        $scheduledExam->update(['submission_time' => now()]);
-        return view('exam.result-page', compact('result'));
+
     }
 
 
