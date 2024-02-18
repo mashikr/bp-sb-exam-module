@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class IqTestController extends Controller
 {
-    public function showTestPage($scheduledExam)
+    public function index($scheduledExam)
     {
 
 
@@ -19,7 +19,7 @@ class IqTestController extends Controller
             ->limit($totalQuestions)
             ->get();
 
-        // Pass the $assignedQuestions and $member to your view
+
         return view('exam.iq-test-page', compact('assignedQuestions', 'scheduledExam'));
 }
     public function submitTest(Request $request)

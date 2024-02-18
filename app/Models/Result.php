@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Result extends Model
 {
     use HasFactory;
-
+    protected $casts = [
+        'result_details' => 'json',
+    ];
     protected $fillable=[
 
         'bpid' ,
@@ -16,7 +18,8 @@ class Result extends Model
         'obtained_marks' ,
         'status',
         'exam_id',
-        'exam_config_id'
+        'exam_config_id',
+        'result_details'
     ];
 
     public function exam()

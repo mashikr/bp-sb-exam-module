@@ -3,115 +3,110 @@
     <style>
         #timer {
             font-weight: bold;
-            color: #333;
-            font-size: 1.2rem;
+            color: darkgreen;
+            font-size: 1.4rem;
         }
 
         #originalTextLabel,
         #typedTextLabel {
+            font-size: 28px;
             font-weight: bold;
             color: #04476f;
         }
 
-        .highlight-correct {
-            background-color: #c3e6cb; /* Light green background */
+
+
+        #typedText,
+        #originalText{
+            font-size: 25px;
+
         }
 
-        .highlight-incorrect {
-            background-color: #f5c6cb; /* Light red background */
+        .correct-letter {
+            font-weight: bold;
+            color: darkgreen;
         }
 
+        .incorrect-letter {
+            font-weight: bold;
+           color: darkred;
+        }
     </style>
-    <div class="container mt-5">
+    <div class="container mt-3">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
                         <h3 class="mb-0">Typing Test</h3>
+
                     </div>
+                    <div id="timer" class="mt-3 text-center"></div>
                     <form id="testForm" action="{{url('/typing-test/check')}}" method="post">
                         @csrf
-                    <div class="card-body p-4">
-                        <input type="hidden" name="correct_words" id="correct-words">
-                        <input type="hidden" name="total_words" id="total-words">
-                        <div class="form-group mb-4">
-                            <label  class="mb-2" id="originalTextLabel">Original Text</label>
-                            <p id="originalText" class="text-muted mb-0">{{ $text->content }}</p>
-                        </div>
-                        <div class="form-group mb-4">
-                            <label for="typedText" class="mb-2" id="typedTextLabel">Type Here</label>
-                            <textarea class="form-control" id="typedText" rows="4" name="typed_text" placeholder="Start typing here..."></textarea>
-                        </div>
-                        <div class="text-center">
-                            <button class="btn btn-success btn-lg" id="submitButton">Submit</button>
-                        </div>
+                        <div class="card-body py-2 px-4">
 
-                        <div id="timer" class="mt-3 text-center"></div>
-                        <div id="result" class="mt-4"></div>
-                    </div>
+                            <input type="hidden" name="start_time" id="start_time">
+                            <input type="hidden" name="original_text" value="{{ $text->content }}">
+                            <div class="form-group mb-3">
+                                <label class="mb-2" id="originalTextLabel">Original Text</label>
+                                <p id="originalText" class="text-muted mb-0">{{ $text->content }}</p>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="typedText" class="mb-2" id="typedTextLabel">Type Here</label>
+                                <textarea class="form-control" id="typedText" rows="4"
+                                          name="typed_text" placeholder="Start typing here..."></textarea>
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-success btn-lg" id="submitButton">Submit</button>
+                            </div>
+
+
+                            <div id="result" class="mt-4"></div>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             let startTime = new Date();
+            $('#start_time').val(startTime.toISOString());
             let endTime;
 
-
-            // Function to highlight words based on correctness
-            function highlightWords() {
+            // Function to highlight letters based on correctness
+            function highlightLetters() {
                 const typedText = $('#typedText').val().trim();
                 const originalText = $('#originalText').text().trim();
 
-                const typedWords = typedText.split(/\s+/); // Split by spaces
-                const originalWords = originalText.split(/\s+/);
-
                 let highlightedText = '';
 
-                for (let i = 0; i < originalWords.length; i++) {
-                    let word = originalWords[i];
+                for (let i = 0; i < originalText.length; i++) {
+                    let letter = originalText[i];
 
-                    if (i < typedWords.length) {
-                        if(typedWords[i] !== undefined){
-
-                            // Word has been completed
-                            if (  typedWords[i] === word) {
-
-                                word = `<span class="highlight-correct">${word}</span>`;
-
-                            } else {
-
-                                word = `<span class="highlight-incorrect">${word}</span>`;
-                            }
+                    if (i < typedText.length) {
+                        if (typedText[i] === letter) {
+                            letter = `<span class="correct-letter">${letter}</span>`;
+                        } else {
+                            letter = `<span class="incorrect-letter">${letter}</span>`;
                         }
-
                     }
 
-                    highlightedText += word + ' ';
+                    highlightedText += letter;
                 }
 
                 $('#originalText').html(highlightedText);
             }
 
             // Attach event listener for typing
-            $('#typedText').on('keydown', function(event) {
-                const keyPressed = event.key;
-
-                if (keyPressed === ' ' || keyPressed === 'Enter') {
-
-                    highlightWords();
-                }
-
-
+            $('#typedText').on('input', function () {
+                highlightLetters();
             });
-            // Submit button click event
-            $('#submitButton').on('click', function() {
-                submitTypingTest();
 
+            // Submit button click event
+            $('#submitButton').on('click', function () {
+                submitTypingTest();
             });
 
             function startTimer(duration) {
@@ -140,21 +135,17 @@
             }
 
             function submitTypingTest() {
+                const correctLetters = $('#originalText').find('.correct-letter').length;
+                highlightLetters();
 
-                const correctWords = $('#originalText').find('.highlight-correct').length;
-                highlightWords();
-                $('#correct-words').val(correctWords);
-                let  totalWords = $('#originalText').text().trim().split(/\s+/).length;
-                $('#total-words').val(totalWords);
+                // let totalWords = $('#originalText').text().trim().length;
+                // $('#total-words').val(totalWords);
 
                 $('#testForm').submit();
-
-
-
             }
 
             // Set the duration of the typing test in seconds
-            const testDuration = 60;
+            const testDuration = {{$text->time_in_seconds}};
             startTimer(testDuration);
         });
     </script>

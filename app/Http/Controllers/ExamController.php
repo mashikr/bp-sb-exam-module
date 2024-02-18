@@ -45,17 +45,14 @@ class ExamController extends Controller
         return view('exam.exam-details-page', ['scheduledExam' => $scheduledExam]);
     }
 
-    public function showTest()
-    {
 
-    }
 
     public function showTestPage()
     {
         $scheduledExam = \auth()->user();
         $examType = $scheduledExam->examConfiguration->exam->type;
         if ($examType === 'mcq') {
-            return $this->iqTestController->showTestPage($scheduledExam);
+            return $this->iqTestController->index($scheduledExam);
         } elseif ($examType === 'typing_test') {
             return $this->typingTestController->index();
         }
