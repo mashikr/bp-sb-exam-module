@@ -21,6 +21,9 @@
         .timer-container {
             margin-top: 10px;
         }
+        #question-options label {
+            user-select: none;
+        }
     </style>
 
 
@@ -61,7 +64,7 @@
                                         @for ($i = 1; $i <= 6; $i++)
                                             @if (!is_null($question["option$i"]))
 
-                                                <div class="p-2 mb-1" id="option"><input type="radio" name="answer[{{ $question->question_id }}]" value="{{ $i}}" class="answer-option"> <span>{{ $question["option$i"] }} </span></div>
+                                                <div class="p-2 mb-1" id="option"><input type="radio"  id="option{{$i}}" name="answer[{{ $question->question_id }}]" value="{{ $i}}" class="answer-option">  <label for="option{{$i}}">{{ $question["option$i"] }}</label></div>
 
 
                                             @endif
