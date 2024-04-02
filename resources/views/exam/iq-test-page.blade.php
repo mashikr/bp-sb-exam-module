@@ -1,6 +1,3 @@
-
-<!-- member-test.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
@@ -21,6 +18,7 @@
         .timer-container {
             margin-top: 10px;
         }
+
         #question-options label {
             user-select: none;
         }
@@ -39,12 +37,12 @@
             <div class="container">
 
 
-                <div id="globalTimer" class="text-center" style="font-size: 18px; color: #e74c3c; margin-top: 20px;"></div>
+                <div id="globalTimer" class="text-center"
+                     style="font-size: 18px; color: #e74c3c; margin-top: 20px;"></div>
 
                 <hr>
 
                 @foreach ($assignedQuestions as $question)
-
 
                     <div class="questions" data-question-index="{{ $loop->index }}">
 
@@ -54,7 +52,10 @@
                                 <div class="d-flex flex-row align-items-center question-title bg-light p-3">
 
 
-                                    <h5><span class="text-primary me-2">Question <span id="question-no">{{$loop->index+1}}</span>.</span> <span class="ml-2" id="question-title">{{ $question->question }}</span></h5>
+                                    <h5><span class="text-primary me-2">Question <span
+                                                id="question-no">{{$loop->index+1}}</span>.</span> <span class="ml-2"
+                                                                                                         id="question-title">{{ $question->question }}</span>
+                                    </h5>
 
 
                                 </div>
@@ -64,8 +65,11 @@
                                         @for ($i = 1; $i <= 6; $i++)
                                             @if (!is_null($question["option$i"]))
 
-                                                <div class="p-2 mb-1" id="option"><input type="radio"  id="option{{$i}}" name="answer[{{ $question->question_id }}]" value="{{ $i}}" class="answer-option">  <label for="option{{$i}}">{{ $question["option$i"] }}</label></div>
-
+                                                <div class="p-2 mb-1" id="option"><input type="radio" id="option{{$i}}"
+                                                                                         name="answer[{{ $question->question_id }}]"
+                                                                                         value="{{ $i}}"
+                                                                                         class="answer-option"> <label
+                                                        for="option{{$i}}">{{ $question["option$i"] }}</label></div>
 
                                             @endif
                                         @endfor
@@ -83,25 +87,20 @@
                                 <div>
                                     <!-- Display "Next" button for all questions except the last one -->
                                     @if (!$loop->last)
-                                        <button type="button" class="next-question btn btn-primary rounded-pill" style="display: none;">Next <i class="fas fa-arrow-right"></i></button>
+                                        <button type="button" class="next-question btn btn-primary rounded-pill"
+                                                style="display: none;">Next <i class="fas fa-arrow-right"></i></button>
                                     @endif
 
                                     <!-- Display "Submit" button for the last question after selecting a radio option -->
                                     @if ($loop->last)
-                                        <button type="submit" class="submit-test btn btn-success rounded-pill" style="display: none;">Submit Test <i class="fas fa-arrow-right"></i></button>
+                                        <button type="submit" class="submit-test btn btn-success rounded-pill"
+                                                style="display: none;">Submit Test <i class="fas fa-arrow-right"></i>
+                                        </button>
                                     @endif
 
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-
-
-
 
 
                     </div>
@@ -150,7 +149,6 @@
                 let currentQuestion = questions.eq(currentQuestionIndex);
                 let nextQuestion = questions.eq(currentQuestionIndex + 1);
 
-                // Validate answer (add your validation logic here)
 
                 // Hide the current question and show the next one
                 currentQuestion.hide();
@@ -194,6 +192,7 @@
 
             // Start the timer for the first question
             startTimer($('.timer').first());
+
 // Function to check and submit the form when the end_time arrives
             function checkEndTime() {
                 let currentTime = new Date().getTime();
@@ -209,6 +208,7 @@
                     displayRemainingTime(remainingTime);
                 }
             }
+
             endTimeIntervalId = setInterval(checkEndTime, 1000);
 
             // Function to display the remaining time
@@ -217,7 +217,7 @@
                 let minutes = Math.floor((remainingTime % 3600) / 60);
                 let seconds = remainingTime % 60;
 
-                $('#globalTimer').text('Exam will end in: ' + hours + 'h '+ minutes + 'm ' + seconds + 's');
+                $('#globalTimer').text('Exam will end in: ' + hours + 'h ' + minutes + 'm ' + seconds + 's');
             }
 
         });

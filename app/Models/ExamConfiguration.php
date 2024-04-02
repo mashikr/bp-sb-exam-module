@@ -15,4 +15,11 @@ class ExamConfiguration extends Model
     {
         return $this->belongsTo(Exam::class, 'exam_id', 'exam_id');
     }
+
+    public function questionSet()
+    {
+        return $this->belongsTo(QuestionSet::class, 'question_set_id', 'question_set_id');
+    }
+
+
 }

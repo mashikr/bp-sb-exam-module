@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Bootstrap CDN link -->
     <!-- Customized Bootstrap Stylesheet -->
-
+    <link rel="stylesheet" href="{{ asset('plugins/summernote/summernote-bs4.min.css') }}">
 
     <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
 
