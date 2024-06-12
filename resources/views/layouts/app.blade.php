@@ -30,6 +30,7 @@
     <!-- Template Stylesheet -->
 <link href="{{asset('assets/css/custom.css')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{{asset('plugins/summernote/summernote-bs4.min.js')}}"></script>
     <style>
         body, .btn, h1, h2, h3, h4, h5, h6 {
             font-family: 'AdorshoLipi', 'Times New Roman', sans-serif !important;

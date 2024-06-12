@@ -22,14 +22,18 @@
 
         }
 
-        .correct-letter {
+        .correct-word {
             font-weight: bold;
             color: darkgreen;
         }
 
-        .incorrect-letter {
+        .incorrect-word {
             font-weight: bold;
-           color: darkred;
+            color: darkred;
+        }
+        .current-word{
+            font-weight: bold;
+            color: blue;
         }
     </style>
     <div class="container mt-3">
@@ -74,26 +78,33 @@
             let startTime = new Date();
             $('#start_time').val(startTime.toISOString());
             let endTime;
-
-            // Function to highlight letters based on correctness
-            function highlightLetters() {
+highlightWords();
+            // Function to highlight words based on correctness
+            function highlightWords() {
                 const typedText = $('#typedText').val().trim();
-                const originalText = $('#originalText').text().trim();
+                const originalWords = $('#originalText').text().trim().split(' ');
+                const typedWords = typedText.split(' ');
 
                 let highlightedText = '';
 
-                for (let i = 0; i < originalText.length; i++) {
-                    let letter = originalText[i];
+                for (let i = 0; i < originalWords.length; i++) {
+                    let word = originalWords[i];
 
-                    if (i < typedText.length) {
-                        if (typedText[i] === letter) {
-                            letter = `<span class="correct-letter">${letter}</span>`;
+
+                    if (i < typedWords.length) {
+
+                        const typedWord = typedWords[i];
+                        if (typedWord === word) {
+                            word = `<span class="correct-word">${word}</span>`;
                         } else {
-                            letter = `<span class="incorrect-letter">${letter}</span>`;
+                            word = `<span class="incorrect-word">${word}</span>`;
                         }
                     }
+                    if(i== typedWords.length){
+                       word= `<span class="current-word">${word}</span>`
+                    }
 
-                    highlightedText += letter;
+                    highlightedText += word + ' ';
                 }
 
                 $('#originalText').html(highlightedText);
@@ -101,7 +112,10 @@
 
             // Attach event listener for typing
             $('#typedText').on('input', function () {
-                highlightLetters();
+                const lastChar = $(this).val().slice(-1); // Get the last entered character
+                if (lastChar === ' ' || lastChar === '\n') {
+                    highlightWords();
+                }
             });
 
             // Submit button click event
@@ -135,10 +149,10 @@
             }
 
             function submitTypingTest() {
-                const correctLetters = $('#originalText').find('.correct-letter').length;
-                highlightLetters();
+                const correctWords = $('#originalText').find('.correct-word').length;
+                highlightWords();
 
-                // let totalWords = $('#originalText').text().trim().length;
+                // let totalWords = $('#originalText').text().trim().split(' ').length;
                 // $('#total-words').val(totalWords);
 
                 $('#testForm').submit();
@@ -148,5 +162,6 @@
             const testDuration = {{$text->time_in_seconds}};
             startTimer(testDuration);
         });
+
     </script>
 @endsection

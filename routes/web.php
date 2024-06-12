@@ -41,4 +41,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/exam/computer-test/submit-test',[ComputerTestController::class,'submitTest']);
 
+    //Basic Computer Test
+
+
 });

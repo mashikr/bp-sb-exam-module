@@ -20,12 +20,14 @@ class ExamController extends Controller
     private IqTestController $iqTestController;
     private TypingTestController $typingTestController;
     private ComputerTestController $computerTestController;
+    private BasicComputerTestController $basicComputerTestController;
 
-    public function __construct(IqTestController $iqTestController, TypingTestController $typingTestController,ComputerTestController $computerTestController)
+    public function __construct(IqTestController $iqTestController, TypingTestController $typingTestController,ComputerTestController $computerTestController,BasicComputerTestController $basicComputerTestController)
     {
         $this->iqTestController = $iqTestController;
         $this->typingTestController = $typingTestController;
         $this->computerTestController=$computerTestController;
+        $this->basicComputerTestController=$basicComputerTestController;
 
     }
 
@@ -56,11 +58,12 @@ class ExamController extends Controller
         $examType = $scheduledExam->examConfiguration->exam->type;
         if ($examType === 'mcq') {
             return $this->iqTestController->index($scheduledExam);
-        } elseif ($examType === 'typing_test') {
-            return $this->typingTestController->index();
         }
-        elseif ($examType === 'computer_test'){
+        elseif ($examType === 'advanced_computer_test'){
            return $this->computerTestController->index($scheduledExam);
+        }
+        elseif ($examType==='basic_computer_test'){
+            return $this->basicComputerTestController->index($scheduledExam);
         }
 
 

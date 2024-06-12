@@ -22,6 +22,11 @@
         #question-options label {
             user-select: none;
         }
+        .answered {
+            background-color: #4caf50;
+            color: #ffffff;
+        }
+
     </style>
 
 
@@ -34,13 +39,22 @@
 
         <div class="container-xxl py-3 mb-5">
 
-            <div class="container">
+            <div class="container ">
+                <div class="question-navigation mt-5 d-flex justify-content-center align-items-center ">
+                    @foreach ($assignedQuestions as $question)
+                        <button type="button" class="navigate-to-question btn btn-outline-primary me-2 rounded-pill"
+                                data-question-index="{{ $loop->index }}">{{ $loop->index + 1 }}</button>
+                    @endforeach
+                </div>
 
 
                 <div id="globalTimer" class="text-center"
                      style="font-size: 18px; color: #e74c3c; margin-top: 20px;"></div>
 
                 <hr>
+                @php
+                    $counter = 0; // Initialize counter variable
+                @endphp
 
                 @foreach ($assignedQuestions as $question)
 
@@ -64,42 +78,53 @@
 
                                         @for ($i = 1; $i <= 6; $i++)
                                             @if (!is_null($question["option$i"]))
-
-                                                <div class="p-2 mb-1" id="option"><input type="radio" id="option{{$i}}"
-                                                                                         name="answer[{{ $question->question_id }}]"
-                                                                                         value="{{ $i}}"
-                                                                                         class="answer-option"> <label
-                                                        for="option{{$i}}">{{ $question["option$i"] }}</label></div>
-
+                                                @php
+                                                    $counter++; // Increment counter
+                                                    $optionId = "option_" . $loop->index . "_" . $counter; // Generate unique ID for option
+                                                @endphp
+                                                <div class="p-2 mb-1" >
+                                                    <input type="radio" id="{{ $optionId }}"
+                                                           name="answer[{{ $question->question_id }}]"
+                                                           value="{{ $i }}"
+                                                           class="answer-option">
+                                                    <label for="{{ $optionId }}">{{ $question["option$i"] }}</label>
+                                                </div>
                                             @endif
                                         @endfor
+
+
 
                                     </div>
 
                                 </div>
                             </div>
-                            <div class="timer-container text-center">
-                                <div class="timer" data-seconds={{$question->time_in_seconds}}></div>
-                            </div>
 
-                            <div class="d-flex justify-content-end mt-5">
 
-                                <div>
+
+                            <div class="d-flex justify-content-center mt-5">
+
+                                    <!-- Display "Previous" button for all questions except the first one -->
+                                    @if ($loop->index !== 0)
+                                        <button type="button" class="previous-question btn btn-primary rounded-pill mx-2">
+                                            <i class="fas fa-arrow-left"></i> Previous
+                                        </button>
+                                    @endif
+
                                     <!-- Display "Next" button for all questions except the last one -->
                                     @if (!$loop->last)
-                                        <button type="button" class="next-question btn btn-primary rounded-pill"
-                                                style="display: none;">Next <i class="fas fa-arrow-right"></i></button>
+                                        <button type="button" class="next-question btn btn-primary rounded-pill mx-2">
+                                            Next <i class="fas fa-arrow-right"></i>
+                                        </button>
                                     @endif
 
                                     <!-- Display "Submit" button for the last question after selecting a radio option -->
                                     @if ($loop->last)
-                                        <button type="submit" class="submit-test btn btn-success rounded-pill"
-                                                style="display: none;">Submit Test <i class="fas fa-arrow-right"></i>
+                                        <button type="submit" class="submit-test btn btn-success rounded-pill mx-2" >
+                                            Submit Test <i class="fas fa-arrow-right"></i>
                                         </button>
                                     @endif
-
-                                </div>
                             </div>
+
                         </div>
 
 
@@ -124,74 +149,68 @@
             let questions = $('.questions');
             console.log(questions);
             let currentQuestionIndex = 0;
-            let intervalId;
+
 
             // Hide all questions except the first one
             questions.slice(1).hide();
 
-            $('.answer-option').on('change', function () {
-                // Show the "Next" button when an answer is selected
-                questions.eq(currentQuestionIndex).find('.next-question').show();
 
-                // If it's the last question and an answer is selected, show the "Submit Test" button
-                if (currentQuestionIndex === questions.length - 1) {
-                    $('.submit-test').show();
-                }
-            });
 
             $('.next-question').on('click', function () {
-                clearInterval(intervalId); // Clear the previous timer
+
 
                 showNextQuestion();
             });
 
             function showNextQuestion() {
-                let currentQuestion = questions.eq(currentQuestionIndex);
                 let nextQuestion = questions.eq(currentQuestionIndex + 1);
-
-
-                // Hide the current question and show the next one
-                currentQuestion.hide();
+                $('.questions').hide();
                 nextQuestion.show();
 
                 // Update the current question index
                 currentQuestionIndex++;
 
-                // Hide the "Next" button for the last question
-                if (currentQuestionIndex === questions.length - 1) {
-                    $('.next-question').hide();
+
+
+            }
+
+            $('.previous-question').on('click', function () {
+                showPreviousQuestion();
+            });
+
+            function showPreviousQuestion() {
+                let previousQuestion = questions.eq(currentQuestionIndex - 1);
+
+                questions.hide();
+                previousQuestion.show();
+
+                // Update the current question index
+                currentQuestionIndex--;
+
+            }
+
+            $(document).ready(function () {
+                // Add event listener to navigation buttons
+                $('.navigate-to-question').on('click', function () {
+                    let questionIndex = $(this).data('question-index');
+                    currentQuestionIndex=questionIndex;
+                    showQuestion(questionIndex);
+                });
+
+                // Function to show a specific question
+                function showQuestion(questionIndex) {
+                    $('.questions').hide(); // Hide all questions
+                    $('.questions[data-question-index="' + questionIndex + '"]').show(); // Show the selected question
                 }
+            });
 
-                // Start the timer for the next question
-                startTimer(nextQuestion.find('.timer'));
-            }
 
-            function startTimer(timerElement) {
-                let seconds = timerElement.data('seconds');
-                intervalId = setInterval(function () {
-                    timerElement.text(seconds + 's');
-
-                    if (seconds <= 0) {
-                        clearInterval(intervalId);
-
-                        // If it's the last question, submit the form
-                        if (currentQuestionIndex === questions.length - 1) {
-                            submitForm();
-                        } else {
-                            showNextQuestion();
-                        }
-                    }
-
-                    seconds--;
-                }, 1000);
-            }
 
             function submitForm() {
                 $('#testForm').submit();
             }
 
-            // Start the timer for the first question
-            startTimer($('.timer').first());
+
 
 // Function to check and submit the form when the end_time arrives
             function checkEndTime() {
@@ -219,6 +238,32 @@
 
                 $('#globalTimer').text('Exam will end in: ' + hours + 'h ' + minutes + 'm ' + seconds + 's');
             }
+
+
+            // Keep track of answered questions
+            let answeredQuestions = [];
+
+// Function to handle radio button change event
+            $('.answer-option').on('change', function () {
+                let questionIndex = $(this).closest('.questions').data('question-index');
+                if (!answeredQuestions.includes(questionIndex)) {
+                    answeredQuestions.push(questionIndex);
+                }
+                updateNavigationButtons();
+            });
+
+// Function to update navigation buttons based on answered questions
+            function updateNavigationButtons() {
+                $('.navigate-to-question').each(function () {
+                    let questionIndex = $(this).data('question-index');
+                    if (answeredQuestions.includes(questionIndex)) {
+                        $(this).addClass('answered');
+                    } else {
+                        $(this).removeClass('answered');
+                    }
+                });
+            }
+
 
         });
     </script>

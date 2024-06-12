@@ -11,6 +11,8 @@
             border-radius: 8px;
             margin-top: 20px;
             font-size: 23px;
+            width: 50%;
+
         }
 
         .result-label {
@@ -34,17 +36,28 @@
             <h2 class="p-4 text-success">Test Successful!!</h2>
 
             <br>
+            @isset($result)
+            @if($result->exam->type=='mcq')
+                <div class="result-details mx-auto my-3">
+                    <h3 class="text-success">Your Score:<span >{{ $result->obtained_marks }}</span></h3>
+                    <p class="result-label">Total Questions: <span class="result-value">{{ $result->total_marks }}</span></p>
 
-{{--            <div class="result-details">--}}
-{{--                <h3 class="text-success">Your Result:</h3>--}}
-{{--                <p class="result-label">Total Questions: <span class="result-value">{{ count($results) }}</span></p>--}}
+                    <p class="result-label">Attempted Questions: <span class="result-value">{{ count(json_decode($result->result_details, true)['selected_answers']) }}</span></p>
 
-{{--                <p class="result-label">Attempted Questions: <span class="result-value">{{ count($attemptedQuestions) }}</span></p>--}}
+                    <p class="result-label">Correct Answers: <span class="correct-answer">{{ $result->obtained_marks }}</span></p>
 
-{{--                <p class="result-label">Correct Answers: <span class="correct-answer">{{ count(array_filter($results, function ($result) { return $result->is_correct; })) }}</span></p>--}}
+                    <p class="result-label">Wrong Answers: <span class="wrong-answer">{{ count(json_decode($result->result_details, true)['selected_answers']) - $result->obtained_marks }}</span></p>
 
-{{--                <p class="result-label">Wrong Answers: <span class="wrong-answer">{{ count(array_filter($results, function ($result) { return !$result->is_correct; })) }}</span></p>--}}
-{{--            </div>--}}
+
+
+                </div>
+
+
+            @endif
+            @endisset
+
+            <a href="#" class="p-3 btn btn-success rounded-pill"><i class="fas fa-file-download"></i> সার্টিফিকেট ডাউনলোড করতে এখানে ক্লিক করুন</a>
+
         </div>
     </div>
 
