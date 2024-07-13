@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\BasicComputerTestQuestion;
 use App\Models\TypingTestQuestion;
+use App\Models\BasicComputerTestResult;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class BasicComputerTestController extends Controller
 {
@@ -14,7 +16,7 @@ class BasicComputerTestController extends Controller
         $questionSet = $scheduledExam->examConfiguration->questionSet;
         $numOfMCQQuestions = $questionSet->num_of_mcq;
         $numOfTrueFalseQuestions = $questionSet->num_of_true_false;
-        $numOfTypingTestQuestions=$questionSet->num_of_true_false;
+        $numOfTypingTestQuestions = $questionSet->num_of_true_false;
 
         // Fetch random MCQ questions from the database
         $mcqQuestions = BasicComputerTestQuestion::where('question_type', 'mcq')
@@ -33,6 +35,80 @@ class BasicComputerTestController extends Controller
             ->limit($numOfTypingTestQuestions)
             ->get();
 
-        return view('exam.basic-computer-test-page',compact('questionSet','scheduledExam','mcqQuestions','trueFalseQuestions','typingTestQuestions'));
+        return view('exam.basic-computer-test-page', compact('questionSet', 'scheduledExam', 'mcqQuestions', 'trueFalseQuestions', 'typingTestQuestions'));
+    }
+
+
+    public function submitTest(Request $request)
+
+    {
+        $scheduledExam = \auth()->user();
+
+
+
+
+        // Calculate MCQ and True/False scores
+        $mcqScore = 0;
+        $trueFalseScore = 0;
+
+        // Get all MCQ questions
+        $mcqQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($request->input('answer', [])))->get();
+        foreach ($mcqQuestions as $question) {
+            $correctOption = $question->correct_answer;
+            $selectedOption = $request->input('answer')[$question->question_id];
+            if ($selectedOption == $correctOption) {
+                $mcqScore += 1;
+            }
+        }
+
+        // Get all True/False questions
+        $trueFalseQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($request->input('true_false_answer', [])))->get();
+        foreach ($trueFalseQuestions as $question) {
+            $correctAnswer = $question->correct_answer;
+            $selectedAnswer = $request->input('true_false_answer')[$question->question_id];
+            if ($selectedAnswer == $correctAnswer) {
+                $trueFalseScore += 1;
+            }
+        }
+        
+        $totalScore = $mcqScore + $trueFalseScore;
+
+        // Prepare the result data
+        $resultData = [];
+
+        foreach ($request->input('answer', []) as $questionId => $selectedOption) {
+            $resultData['mcq'][$questionId] = $selectedOption;
+        }
+
+        foreach ($request->input('true_false_answer', []) as $questionId => $selectedAnswer) {
+            $resultData['true_false'][$questionId] = $selectedAnswer;
+        }
+      
+        foreach ($request->input('typed_text', []) as $questionId => $typedText) {
+            $resultData['typing_test'][$questionId] = $typedText;
+        }
+
+        // Store the results
+        $result = BasicComputerTestResult::create([
+            'exam_schedule_id' => $scheduledExam->id,
+            'mcq_score' => $mcqScore,
+            'true_false_score' => $trueFalseScore,
+            'total_score' => $totalScore,
+            'result_data' => $resultData,
+        ]);
+
+        return redirect()->route('basic-computer-test.result', $result->id);
+    }
+
+    // Method to show the results
+    public function showResult($id)
+    {
+        $result = BasicComputerTestResult::with(['examSchedule'])->findOrFail($id);
+
+        $mcqQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($result->result_data['mcq'] ?? []))->get();
+        $trueFalseQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($result->result_data['true_false'] ?? []))->get();
+        $typingTestQuestions = TypingTestQuestion::whereIn('question_id', array_keys($result->result_data['typing_test'] ?? []))->get();
+
+        return view('exam.basic-computer-test-result', compact('result', 'mcqQuestions', 'trueFalseQuestions', 'typingTestQuestions'));
     }
 }
