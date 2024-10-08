@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BasicComputerTestQuestion;
+use App\Models\ExamSchedule;
 use App\Models\TypingTestQuestion;
 use App\Models\BasicComputerTestResult;
 use Illuminate\Http\Request;
@@ -44,12 +45,11 @@ class BasicComputerTestController extends Controller
     {
         $scheduledExam = \auth()->user();
 
-
-
-
         // Calculate MCQ and True/False scores
         $mcqScore = 0;
         $trueFalseScore = 0;
+        $typingTestScore = 0;
+        $defaultTypingTestScore = 10;
 
         // Get all MCQ questions
         $mcqQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($request->input('answer', [])))->get();
@@ -70,8 +70,31 @@ class BasicComputerTestController extends Controller
                 $trueFalseScore += 1;
             }
         }
-        
-        $totalScore = $mcqScore + $trueFalseScore;
+
+        // Calculate Typing Test Score based on correctly typed words
+        foreach ($request->input('typed_text', []) as $questionId => $typedText) {
+            $typingTestQuestion = TypingTestQuestion::find($questionId);
+            $originalText = $typingTestQuestion->content;
+
+            // Split the texts into arrays of words
+            $originalWords = explode(' ', $originalText);
+            $typedWords = explode(' ', $typedText);
+
+            // Count correctly typed words
+            $correctlyTypedWords = 0;
+            foreach ($originalWords as $index => $originalWord) {
+                if (isset($typedWords[$index]) && $typedWords[$index] === $originalWord) {
+                    $correctlyTypedWords += 1;
+                }
+            }
+
+            $originalWordCount = count($originalWords);
+
+            // Calculate score based on the formula: (correctly typed words / original words) * default score
+            $typingTestScore += ($correctlyTypedWords / $originalWordCount) * $defaultTypingTestScore;
+        }
+
+        $totalScore = $mcqScore + $trueFalseScore + $typingTestScore;
 
         // Prepare the result data
         $resultData = [];
@@ -83,7 +106,7 @@ class BasicComputerTestController extends Controller
         foreach ($request->input('true_false_answer', []) as $questionId => $selectedAnswer) {
             $resultData['true_false'][$questionId] = $selectedAnswer;
         }
-      
+
         foreach ($request->input('typed_text', []) as $questionId => $typedText) {
             $resultData['typing_test'][$questionId] = $typedText;
         }
@@ -93,22 +116,30 @@ class BasicComputerTestController extends Controller
             'exam_schedule_id' => $scheduledExam->id,
             'mcq_score' => $mcqScore,
             'true_false_score' => $trueFalseScore,
+            'typing_test_score'=>$typingTestScore,
             'total_score' => $totalScore,
+
             'result_data' => $resultData,
         ]);
 
-        return redirect()->route('basic-computer-test.result', $result->id);
+        // Update scheduled exam status and submission time
+        $scheduledExam->update(['status' => 'completed']);
+        $scheduledExam->update(['submission_time' => now()]);
+
+        return redirect()->route('basic-computer-test.result', $scheduledExam->id);
     }
 
     // Method to show the results
-    public function showResult($id)
+    public function showResult($examScheduleId)
     {
-        $result = BasicComputerTestResult::with(['examSchedule'])->findOrFail($id);
+        $examSchedule = ExamSchedule::with(['examConfiguration.exam', 'member'])->findOrFail($examScheduleId);
+        $result = BasicComputerTestResult::where('exam_schedule_id', $examScheduleId)->first();;
 
         $mcqQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($result->result_data['mcq'] ?? []))->get();
         $trueFalseQuestions = BasicComputerTestQuestion::whereIn('question_id', array_keys($result->result_data['true_false'] ?? []))->get();
         $typingTestQuestions = TypingTestQuestion::whereIn('question_id', array_keys($result->result_data['typing_test'] ?? []))->get();
 
-        return view('exam.basic-computer-test-result', compact('result', 'mcqQuestions', 'trueFalseQuestions', 'typingTestQuestions'));
+
+        return view('exam.basic-computer-test-result', compact('result', 'mcqQuestions', 'trueFalseQuestions', 'typingTestQuestions','examSchedule'));
     }
 }

@@ -19,7 +19,8 @@ class Result extends Model
         'status',
         'exam_id',
         'exam_config_id',
-        'result_details'
+        'result_details',
+        'exam_schedule_id'
     ];
 
     public function exam()
@@ -37,5 +38,9 @@ class Result extends Model
     public function member()
     {
         return $this->belongsTo(Member::class, 'bpid', 'bpid');
+    }
+    public function examSchedule()
+    {
+        return $this->belongsTo(ExamSchedule::class, 'exam_schedule_id', 'id');
     }
 }

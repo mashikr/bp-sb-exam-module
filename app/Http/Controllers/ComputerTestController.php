@@ -43,6 +43,6 @@ class ComputerTestController extends Controller
         }
         $scheduledExam->update(['status'=>'completed']);
         $scheduledExam->update(['submission_time' => now()]);
-        return view('exam.result-page');
+        return view('exam.advanced-computer-test-result-page');
     }
 }

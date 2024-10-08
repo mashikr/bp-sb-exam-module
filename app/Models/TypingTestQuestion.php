@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TypingTestQuestion extends Model
 {
     use HasFactory;
-
+    protected $primaryKey = 'question_id';
     protected $fillable=[
         'content'
     ];

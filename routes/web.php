@@ -46,4 +46,7 @@ Route::middleware(['auth'])->group(function () {
     //Basic Computer Test
     Route::post('/exam/basic-computer-test/submit', [BasicComputerTestController::class, 'submitTest'])->name('basic-computer-test.submit');
     Route::get('/exam/basic-computer-test/result/{id}', [BasicComputerTestController::class, 'showResult'])->name('basic-computer-test.result');
+
+    //iq test
+    Route::get('/exam/iq-test/result/{id}', [IqTestController::class, 'showResult'])->name('iq-test.result');
 });

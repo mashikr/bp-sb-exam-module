@@ -23,6 +23,7 @@ class BasicComputerTestResult extends Model
         'exam_schedule_id',
         'mcq_score',
         'true_false_score',
+        'typing_test_score',
         'total_score',
         'result_data',
     ];
