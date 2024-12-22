@@ -36,7 +36,7 @@
         <!-- Print and Download Buttons -->
         <div class="text-center mb-4">
             <button class="btn btn-primary me-2" onclick="window.print()">Print Results</button>
-            <button class="btn btn-secondary" id="downloadBtn">Download Results</button>
+
         </div>
 
         <div class="row">
@@ -134,22 +134,22 @@
             $('#typedText' + index).html(highlightedText.trim()); // Populate the paragraph with highlighted typed text
         }
 
-        // Download button functionality
-        $('#downloadBtn').on('click', function() {
-            const { jsPDF } = window.jspdf; // Access jsPDF
-            const doc = new jsPDF();
-            const resultsContent = $('.container').html(); // Get the results HTML content
-
-            // Sanitize the HTML content
-            const sanitizedContent = DOMPurify.sanitize(resultsContent);
-
-            doc.html(sanitizedContent, {
-                callback: function(doc) {
-                    doc.save('basic_computer_test_result.pdf'); // Download the PDF
-                },
-                x: 10,
-                y: 10
-            });
-        });
+        // // Download button functionality
+        // $('#downloadBtn').on('click', function() {
+        //     const { jsPDF } = window.jspdf; // Access jsPDF
+        //     const doc = new jsPDF();
+        //     const resultsContent = $('.container').html(); // Get the results HTML content
+        //
+        //     // Sanitize the HTML content
+        //     const sanitizedContent = DOMPurify.sanitize(resultsContent);
+        //
+        //     doc.html(sanitizedContent, {
+        //         callback: function(doc) {
+        //             doc.save('basic_computer_test_result.pdf'); // Download the PDF
+        //         },
+        //         x: 10,
+        //         y: 10
+        //     });
+        // });
     });
 </script>
