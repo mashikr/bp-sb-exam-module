@@ -62,7 +62,16 @@
                  class="test-part">
                 <h2 class="text-center">Part A: Multiple Choice Questions</h2>
                 <div class="container-xl py-3 mb-5">
-
+                    <!-- Navigation Buttons -->
+                    <div id="mcq-navigation" class="d-flex justify-content-center mb-3">
+                        @foreach ($mcqQuestions as $question)
+                            <button type="button"
+                                    class="btn btn-outline-primary  rounded-circle mx-1 question-nav-btn"
+                                    data-question-index="{{ $loop->index }}">
+                                {{ $loop->index + 1 }}
+                            </button>
+                        @endforeach
+                    </div>
                     <div class="container ">
 
                         <hr>
@@ -166,6 +175,15 @@
                  style="display: none;">
                 <h2 class="text-center">Part B: True/False</h2>
                 <div class="container-xl py-3 mb-5">
+                    <div class="d-flex justify-content-center mb-3" id="trueFalseNav">
+                        @foreach ($trueFalseQuestions as $question)
+                            <button type="button"
+                                    class="btn btn-outline-primary rounded-circle mx-1 true-false-nav-btn"
+                                    data-question-index="{{ $loop->index }}">
+                                {{ $loop->index + 1 }}
+                            </button>
+                        @endforeach
+                    </div>
 
                     <div class="container">
 
@@ -202,14 +220,14 @@
                                        class="mb-2"
                                        for="true-false_answer{{ $question->question_id }}">Answer </label>
                                 <select id="true-false_answer{{ $question->question_id }}"
-                                        name="true_false_answer[{{ $question->question_id }}]"
-                                        class="col-md-4  btn btn-primary ms-2 true-false-answer">
-                                    <option value=""
-                                            selected
-                                            disabled>Select true or false</option>
-                                    <option value="true">True</option>
-                                    <option value="false">False</option>
+                                        data-question-index="{{ $loop->index }}"
+                                name="true_false_answer[{{ $question->question_id }}]"
+                                class="col-md-4 btn btn-primary ms-2 true-false-answer">
+                                <option value="" selected disabled>Select true or false</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
                                 </select>
+
                             </div>
                             <div class="d-flex justify-content-end mt-5">
 
@@ -407,100 +425,108 @@ $(document).ready(function() {
 
     ///MCQ question part
     let questions = $('.questions');
-    console.log(questions);
     let currentQuestionIndex = 0;
 
+    // Initially hide all questions except the first one
+    questions.hide();
+    questions.first().show();
 
-    // Hide all questions except the first one
-    questions.slice(1).hide();
-
-
-    $('.next-question').on('click', function() {
-
-
-        showNextQuestion();
+    // Navigation for numbered buttons
+    $('.question-nav-btn').on('click', function () {
+        let questionIndex = $(this).data('question-index');
+        showQuestion(questionIndex);
     });
 
-    function showNextQuestion() {
-        let nextQuestion = questions.eq(currentQuestionIndex + 1);
-        $('.questions').hide();
-        nextQuestion.show();
-
-        // Update the current question index
-        currentQuestionIndex++;
-
-
+    // Show a specific question
+    function showQuestion(index) {
+        questions.hide(); // Hide all questions
+        questions.eq(index).show(); // Show the selected question
+        currentQuestionIndex = index; // Update the current question index
     }
 
-    $('.previous-question').on('click', function() {
-        showPreviousQuestion();
+    // Next and Previous buttons
+    $('.next-question').on('click', function () {
+        if (currentQuestionIndex < questions.length - 1) {
+            showQuestion(currentQuestionIndex + 1);
+        }
     });
 
-    function showPreviousQuestion() {
-        let previousQuestion = questions.eq(currentQuestionIndex - 1);
+    $('.previous-question').on('click', function () {
+        if (currentQuestionIndex > 0) {
+            showQuestion(currentQuestionIndex - 1);
+        }
+    });
 
-        questions.hide();
-        previousQuestion.show();
-
-        // Update the current question index
-        currentQuestionIndex--;
-
-    }
-
+    // Handle question answer selection
+    $('.answer-option').on('change', function() {
+        let questionIndex = $(this).closest('.questions').data('question-index');
+        // Highlight the corresponding navigation button as green
+        $('.question-nav-btn').eq(questionIndex).removeClass('btn-outline-primary').addClass('btn-success');
+    });
 
     /////True false questions//////
 
-    // Function to show the next true/false question
-    function showNextTrueFalseQuestion() {
-        let currentQuestion = $('.true-false-questions').eq(currentTrueFalseIndex);
-        currentQuestion.hide(); // Hide the current question
-
-        // Move to the next question
-        currentTrueFalseIndex++;
-
-        // Check if there's a next question
-        if (currentTrueFalseIndex < $('.true-false-questions').length) {
-            let nextQuestion = $('.true-false-questions').eq(currentTrueFalseIndex);
-            nextQuestion.show(); // Show the next question
-
-
-        }
-    }
-
-    // Function to show the previous true/false question
-    function showPreviousTrueFalseQuestion() {
-        let currentQuestion = $('.true-false-questions').eq(currentTrueFalseIndex);
-        currentQuestion.hide(); // Hide the current question
-
-        // Move to the previous question
-        currentTrueFalseIndex--;
-
-        // Check if there's a previous question
-        if (currentTrueFalseIndex >= 0) {
-            let previousQuestion = $('.true-false-questions').eq(currentTrueFalseIndex);
-            previousQuestion.show(); // Show the previous question
-
-        }
-    }
-
-
-    // Variable to keep track of the current true/false question index
+    // Variable to track the current True/False question index
     let currentTrueFalseIndex = 0;
+    let answeredQuestions = []; // Array to keep track of answered questions
 
-    // Show the first true/false question initially
+// Show the first True/False question initially
     $('.true-false-questions').hide();
     $('.true-false-questions').eq(currentTrueFalseIndex).show();
 
-    // Handle next button click for true/false questions
-    $('.next-true-false-question').click(function() {
-        showNextTrueFalseQuestion();
+// Update navigation button highlighting
+    function highlightNavButton(index) {
+        $('.true-false-nav-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+
+        // If the question is answered, add the 'btn-success' class (green)
+        if (answeredQuestions[index]) {
+            $('.true-false-nav-btn').eq(index).removeClass('btn-outline-primary').addClass('btn-success');
+        } else {
+            $('.true-false-nav-btn').eq(index).removeClass('btn-success').addClass('btn-outline-primary');
+        }
+    }
+
+// Highlight the first button initially
+    highlightNavButton(currentTrueFalseIndex);
+
+// Function to show a specific True/False question
+    function showTrueFalseQuestion(index) {
+        $('.true-false-questions').hide();
+        $('.true-false-questions').eq(index).show();
+        currentTrueFalseIndex = index;
+        highlightNavButton(index);
+    }
+
+// Handle navigation button clicks
+    $('.true-false-nav-btn').click(function () {
+        const questionIndex = $(this).data('question-index');
+        showTrueFalseQuestion(questionIndex);
     });
 
-    // Handle previous button click for true/false questions
-    $('.previous-true-false-question').click(function() {
-        showPreviousTrueFalseQuestion();
+// Handle next button click for True/False questions
+    $('.next-true-false-question').click(function () {
+        if (currentTrueFalseIndex < $('.true-false-questions').length - 1) {
+            showTrueFalseQuestion(currentTrueFalseIndex + 1);
+        }
     });
 
+// Handle previous button click for True/False questions
+    $('.previous-true-false-question').click(function () {
+        if (currentTrueFalseIndex > 0) {
+            showTrueFalseQuestion(currentTrueFalseIndex - 1);
+        }
+    });
+
+// Handle the answering of a True/False question
+    $('.true-false-answer').change(function() {
+        const questionIndex = $(this).data('question-index');
+
+        // Mark the question as answered
+        answeredQuestions[questionIndex] = true;
+
+        // Highlight the button for this question as green (answered)
+        highlightNavButton(questionIndex);
+    });
 
 
     ///// Typing Test Questions

@@ -49,7 +49,16 @@
                 <div id="globalTimer" class="text-center"
                      style="font-size: 18px; color: #e74c3c; margin-top: 20px;"></div>
                 <hr>
-
+                <!-- Navigation Buttons Section -->
+                <div class="navigation-buttons text-center mb-4">
+                    @foreach ($questions as $question)
+                        <button type="button"
+                                class="btn btn-outline-primary rounded-circle question-nav-btn"
+                                data-question-index="{{ $loop->index }}">
+                            {{ $loop->index + 1 }}
+                        </button>
+                    @endforeach
+                </div>
                 @foreach ($questions as $question)
 
                     <div class="questions" data-question-index="{{ $loop->index }}">
@@ -170,45 +179,85 @@
 
 
             let questions = $('.questions');
-            console.log(questions);
+            let navButtons = $('.question-nav-btn');
             let currentQuestionIndex = 0;
 
             // Hide all questions except the first one
-            questions.slice(1).hide();
-            if (currentQuestionIndex === questions.length - 1) {
-                $('.submit-test').show();
-            }
+            questions.hide();
+            questions.eq(0).show(); // Show the first question only
 
-            $('.next-question').on('click', function () {
-
-
-                showNextQuestion();
+            // Navigation button click logic
+            navButtons.on('click', function () {
+                let questionIndex = $(this).data('question-index');
+                navigateToQuestion(questionIndex);
             });
 
-            function showNextQuestion() {
-                let currentQuestion = questions.eq(currentQuestionIndex);
-                let nextQuestion = questions.eq(currentQuestionIndex + 1);
+            function navigateToQuestion(index) {
+                // Hide all questions, show the selected one
+                questions.hide();
+                questions.eq(index).show();
+                currentQuestionIndex = index;
+
+                // Update navigation button styles
+                updateNavButtonStyles();
+            }
 
 
-                // Hide the current question and show the next one
-                currentQuestion.hide();
-                nextQuestion.show();
+            function updateNavButtonStyles() {
+                navButtons.removeClass('btn-primary btn-success').addClass('btn-outline-primary');
 
-                // Update the current question index
-                currentQuestionIndex++;
+                // Highlight the current question's button
+                navButtons.eq(currentQuestionIndex).addClass('btn-primary');
 
-                // Hide the "Next" button for the last question
-                if (currentQuestionIndex === questions.length - 1) {
-                    $('.next-question').hide();
-                    $('.submit-test').show();
+                // Mark answered questions' buttons as green
+                let allAnswered = true; // Track if all questions are answered
+                questions.each(function () {
+                    let questionIndex = $(this).data('question-index');
+                    if (checkIfAnswered($(this))) {
+                        navButtons.eq(questionIndex).removeClass('btn-primary btn-outline-primary').addClass('btn-success');
+                    } else {
+                        allAnswered = false;
+                    }
+                });
+
+                // Show the submit button if all questions are answered and on the last question
+                if (allAnswered && currentQuestionIndex === questions.length - 1) {
+                    $('.submit-test').show(); // Display the submit button
+                } else {
+                    $('.submit-test').hide(); // Hide it otherwise
+                }
+            }
+
+
+            function checkIfAnswered(questionElement) {
+                // Check for answered MCQs (radio buttons)
+                if (questionElement.find('.answer-option:checked').length > 0) {
+                    return true;
                 }
 
+                // Check for descriptive or short answers (textareas)
+                if (questionElement.find('textarea').filter(function () {
+                    return $(this).val().trim() !== '';
+                }).length > 0) {
+                    return true;
+                }
+
+                // Check for True/False (dropdowns)
+                if (questionElement.find('.true-false-answer').filter(function () {
+                    return $(this).val() !== null && $(this).val().trim() !== '';
+                }).length > 0) {
+                    return true;
+                }
+
+                return false;
             }
 
+            // Detect when an answer is provided
+            $(document).on('change input', '.answer-option, .true-false-answer, textarea', function () {
+                updateNavButtonStyles();
+            });
 
-            function submitForm() {
-                // $('#testForm').submit();
-            }
+
 
 
 // Function to check and submit the form when the end_time arrives
